@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:smart_home/utils/app_colors.dart';
 import 'package:smart_home/utils/app_styles.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class AboutUsScreen extends StatelessWidget {
   const AboutUsScreen({super.key});
@@ -62,7 +63,24 @@ class AboutUsScreen extends StatelessWidget {
               title: 'Reliable Experience',
               description: 'Built with a focus on performance, stability, and account security.',
             ),
-            SizedBox(height: height * 0.02),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.engineering_outlined, size: 18, color: Colors.grey),
+                const SizedBox(width: 6),
+                Text('Developed By ', style: AppStyles.medium14Gray,),
+                InkWell(
+                  onTap: openGitHub,
+                  child: const Text(
+                    'Youssef Rabea',
+                    style: TextStyle(
+                      color: Colors.blue,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ],
+            )
           ],
         ),
       ),
@@ -163,5 +181,16 @@ class AboutUsScreen extends StatelessWidget {
       ),
     );
   }
+}
+Future<void> openGitHub() async {
+  final Uri url = Uri.parse(
+    'https://github.com/Y0ussefRabea/smart_home',
+  );
 
+  if (await canLaunchUrl(url)) {
+    await launchUrl(
+      url,
+      mode: LaunchMode.externalApplication,
+    );
+  }
 }

@@ -7,13 +7,15 @@ class CustomDataCard extends StatelessWidget {
   final String text;
   final String statusText;
   final bool isGasCard;
+  final bool gasSafe;
 
   const CustomDataCard({
     super.key,
     required this.imageIcon,
     required this.text,
     required this.statusText,
-    this.isGasCard=false
+    this.isGasCard = false,
+    this.gasSafe = true,
   });
 
   @override
@@ -21,19 +23,25 @@ class CustomDataCard extends StatelessWidget {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
 
+    final bool isAlert = isGasCard && !gasSafe;
+
     return Container(
       padding: EdgeInsets.only(
-        top:height*0.03,
-        left: width*0.04
+        top: height * 0.03,
+        left: width * 0.04,
       ),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(36),
-        border: Border.all(color: AppColors.primaryLight,width: 1.2)
+        color: isAlert ? Colors.red.shade100 : Colors.white,
+        border: Border.all(
+          color: isAlert ? Colors.red : AppColors.primaryLight,
+          width: 1.2,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Image.asset(imageIcon,width: 20,),
+          Image.asset(imageIcon, width: 20),
           const SizedBox(height: 4),
           Text(
             text,
@@ -43,11 +51,13 @@ class CustomDataCard extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           FittedBox(
-          //  fit: BoxFit.scaleDown,
             alignment: Alignment.centerLeft,
             child: Text(
               statusText,
-              style: AppStyles.bold30Black.copyWith(fontSize: 28),
+              style: AppStyles.bold30Black.copyWith(
+                fontSize: 28,
+                color: isAlert ? Colors.red : Colors.black,
+              ),
               maxLines: 1,
             ),
           ),

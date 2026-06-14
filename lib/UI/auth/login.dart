@@ -20,6 +20,13 @@ class _LoginScreenState extends State<LoginScreen> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   var formKey = GlobalKey<FormState>();
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

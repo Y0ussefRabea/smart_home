@@ -67,11 +67,13 @@ class _HomeTabState extends State<HomeTab> {
                             '${smartHomeProvider.humidity.toStringAsFixed(1)} %',
                       ),
                       CustomDataCard(
+                        isGasCard: true,
                         imageIcon: AppAssets.gasIcon,
                         text: 'Gas Status',
                         statusText: smartHomeProvider.gasSafe
                             ? 'Safe'
-                            : 'Alert',
+                            : 'Gas Leak!',
+                        gasSafe: smartHomeProvider.gasSafe,
                       ),
                       CustomDataCard(
                         imageIcon: AppAssets.doorIcon,
@@ -82,28 +84,44 @@ class _HomeTabState extends State<HomeTab> {
                   ),
 
                   SizedBox(height: height * 0.02),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Image.asset(AppAssets.robotIcon,width: width*0.1,),
-                      Text('Auto Mode',style: AppStyles.medium14Primary,),
-                      Switch(
+                  Container(
+                   padding: EdgeInsets.symmetric(
+                     vertical: height*0.01,
+                   ),
+                    width: width*0.6,
 
-                          value: smartHomeProvider.autoMode,
-                          onChanged: smartHomeProvider.setAutoMode,
-
-                        thumbColor: WidgetStateProperty.resolveWith((states) {
-                          return AppColors.whiteColor;
-                        }),
-
-                        trackColor: WidgetStateProperty.resolveWith((states) {
-                          if (states.contains(WidgetState.selected)) {
-                            return AppColors.primaryLight; // ON
-                          }
-                          return AppColors.offWhiteColor; // OFF
-                        }),
+                    decoration: BoxDecoration(
+                        color: Color(0XFFF3FFF8),
+                      borderRadius: BorderRadius.circular(10),
+                      border: BoxBorder.all(
+                        color: Colors.blue,
+                        width: 1.5
                       )
-                    ],
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset(AppAssets.robotIcon,width: width*0.1,),
+                        SizedBox(width: width*0.02,),
+                        Text('Auto Mode',style: AppStyles.bold14black),
+                        SizedBox(width: width*0.02,),
+                        Switch(
+                            value: smartHomeProvider.autoMode,
+                            onChanged: smartHomeProvider.setAutoMode,
+
+                          thumbColor: WidgetStateProperty.resolveWith((states) {
+                            return AppColors.whiteColor;
+                          }),
+
+                          trackColor: WidgetStateProperty.resolveWith((states) {
+                            if (states.contains(WidgetState.selected)) {
+                              return AppColors.primaryLight; // ON
+                            }
+                            return AppColors.offWhiteColor; // OFF
+                          }),
+                        )
+                      ],
+                    ),
                   ),
                   SizedBox(height: height * 0.02),
                   Row(
@@ -122,25 +140,35 @@ class _HomeTabState extends State<HomeTab> {
                   ),
                   SizedBox(height: height * 0.02),
 
+                  ///Out side lights
                   CustomSwitchControl(
                     title: 'Out side lights',
                     icon: AppAssets.bulb,
                     animateLightIcon: true,
                     value: smartHomeProvider.outsideLightsOn,
                     onChanged: smartHomeProvider.setOutsideLights,
+                    disabled: smartHomeProvider.autoMode,
                   ),
+
+                  ///room fan
                   CustomSwitchControl(
                     title: 'Room Fan',
                     icon: AppAssets.fanImage,
                     value: smartHomeProvider.roomFanOn,
                     onChanged: smartHomeProvider.setRoomFan,
+                    disabled: smartHomeProvider.autoMode,
                   ),
+
+                  ///Kitchen Hood
                   CustomSwitchControl(
                     title: 'Kitchen Hood',
                     icon: AppAssets.fanImage,
                     value: smartHomeProvider.kitchenHoodOn,
                     onChanged: smartHomeProvider.setKitchenHood,
+                    disabled: smartHomeProvider.autoMode,
                   ),
+
+                  ///Main Door
                   CustomSwitchControl(
                     title: 'Main Door',
                     icon: AppAssets.doorImage,

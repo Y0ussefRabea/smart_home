@@ -20,18 +20,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
   TextEditingController emailController = TextEditingController();
   TextEditingController nameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
-  final TextEditingController confirmPasswordController =
-  TextEditingController();
-
+  final TextEditingController confirmPasswordController = TextEditingController();
   var formKey = GlobalKey<FormState>();
   @override
   void dispose() {
-    // TODO: implement dispose
-    super.dispose();
     emailController.dispose();
-
-    /// to remove the value of the controller after closing or moving from the screen(for memory saving)
     passwordController.dispose();
+    nameController.dispose();
+    confirmPasswordController.dispose();
+    super.dispose();
   }
 
   @override
