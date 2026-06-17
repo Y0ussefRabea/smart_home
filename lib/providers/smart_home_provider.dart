@@ -4,13 +4,29 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart';
 import 'package:smart_home/services/device_state_service.dart';
 
+import '../models/notification_model.dart';
+import '../services/notification_service.dart';
+
 class SmartHomeProvider extends ChangeNotifier {
+  final List<NotificationModel> _notifications = [];
+  List<NotificationModel> get notifications => List.unmodifiable(_notifications);
+
+  void addNotification(String title, String type) {
+    _notifications.insert(0, NotificationModel(
+      title: title,
+      type: type,
+      time: DateTime.now(),
+    ));
+    notifyListeners();
+  }
   StreamSubscription<DatabaseEvent>? _statesSubscription;
+
   ///sensors
   double _temperature = 0;
   double _humidity = 0;
   bool _gasSafe = true;
   String _doorState = 'Unknown';
+
   ///system mode
   bool _autoMode = true;
 
@@ -21,6 +37,11 @@ class SmartHomeProvider extends ChangeNotifier {
   bool _mainDoorLocked = false;
 
   bool _isLoading = true;
+
+  ///alerts
+  bool _gasAlertSent = false;
+  bool _doorAlertSent = false;
+  bool _tempAlertSent = false;
 
   ///getters, to get the values
   double get temperature => _temperature;
@@ -38,14 +59,41 @@ class SmartHomeProvider extends ChangeNotifier {
 
   void startListening() {
     _statesSubscription ??= DeviceStateService.statesStream.listen((event) {
-      final rootMap = _asMap(event.snapshot.value); ///_asMap converts the object to a map(key:value)
+      final rootMap = _asMap(event.snapshot.value);
+
+      ///_asMap converts the object to a map(key:value)
       final sensors = _asMap(rootMap['sensors']);
       final devices = _asMap(rootMap['devices']);
 
-      _temperature = _asDouble(sensors['temperature'], fallback: 0); // fallback is reserve value
+      _temperature = _asDouble(
+        sensors['temperature'],
+        fallback: 0,
+      ); // fallback is reserve value
       _humidity = _asDouble(sensors['humidity'], fallback: 0);
       _gasSafe = _asBool(sensors['gasSafe'], fallback: true);
       _doorState = _asDoorState(sensors['doorState']);
+
+                                ///notifications handling///
+      /// Gas Leak
+      if (!_gasSafe && !_gasAlertSent) {
+        _gasAlertSent = true;
+        NotificationService.showNotification(title: 'Gas Leak Detected', body: "don't worry, the kitchen hood is on");
+        addNotification('Gas Leak Detected', 'gas');
+      }
+
+     /// Door Opened
+      if (_doorState.toLowerCase() == 'unlocked' && !_doorAlertSent) {
+        _doorAlertSent = true;
+        NotificationService.showNotification(title: 'Door Unlocked', body: 'the main door has been unlocked');
+        addNotification('Door Unlocked', 'door'); //
+      }
+
+     /// High Temperature
+      if (_temperature > 35 && !_tempAlertSent) {
+        _tempAlertSent = true;
+        NotificationService.showNotification(title: 'High Temperature', body: 'high temperature detected, the fan is on now');
+        addNotification('High Temperature', 'temp');
+      }
 
       _outsideLightsOn = _asBool(devices['outsideLights'], fallback: false);
       _roomFanOn = _asBool(devices['roomFan'], fallback: false);
@@ -61,10 +109,12 @@ class SmartHomeProvider extends ChangeNotifier {
   Future<void> setAutoMode(bool value) async {
     await DeviceStateService.setAutoMode(value);
 
-    ///to turn off the switches of when the auto mode is on///
-    await DeviceStateService.setOutsideLights(false);
-    await DeviceStateService.setRoomFan(false);
-    await DeviceStateService.setKitchenHood(false);
+    ///to turn off the switches when the auto mode is on///
+    if (value == true) {
+      await DeviceStateService.setOutsideLights(false);
+      await DeviceStateService.setRoomFan(false);
+      await DeviceStateService.setKitchenHood(false);
+    }
   }
 
   Future<void> setOutsideLights(bool value) async {

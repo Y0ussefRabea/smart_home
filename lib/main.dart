@@ -7,15 +7,40 @@ import 'package:smart_home/UI/auth/register.dart';
 import 'package:smart_home/UI/home/home.dart';
 import 'package:smart_home/providers/smart_home_provider.dart';
 import 'package:smart_home/utils/app_routes.dart';
-
 import 'UI/auth/forgot_password.dart';
 import 'firebase_options.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'services/notification_service.dart';
 
+///background notifications handling
+@pragma('vm:entry-point')
+Future<void> firebaseMessagingBackgroundHandler(
+    RemoteMessage message) async {
+  print('Background message received');
+}
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();// this makes the runApp function and firebase work simultaneously to prevent errors
   await Firebase.initializeApp(
     options:DefaultFirebaseOptions.currentPlatform,
   );
+
+///firebase messaging initialize
+  await NotificationService.initialize();
+  FirebaseMessaging.onBackgroundMessage(
+    firebaseMessagingBackgroundHandler,
+  );
+
+  await FirebaseMessaging.instance.requestPermission();
+  String? token = await FirebaseMessaging.instance.getToken();
+  print('FCM TOKEN: $token');
+
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    NotificationService.showNotification(
+      title: message.notification?.title ?? 'Smart Home Alert',
+      body: message.notification?.body ?? '',
+    );
+  });
+
   runApp(const MyApp());
 }
 

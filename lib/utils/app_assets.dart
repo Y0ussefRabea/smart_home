@@ -17,5 +17,6 @@ class AppAssets {
   static const String emailIcon='assets/images/emailIcon.png';
   static const String aboutUsIcon='assets/images/aboutUs.png';
   static const String robotIcon='assets/images/robotIcon.png';
+  static const String highTempIcon='assets/images/highTemp.png';
 
 }

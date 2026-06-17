@@ -37,7 +37,7 @@ class _HomeTabState extends State<HomeTab> {
         title: Text('Home Status', style: AppStyles.bold18black),
       ),
       body: smartHomeProvider.isLoading
-          ? const Center(child: CircularProgressIndicator()) ///handles the loading
+          ? const Center(child: CircularProgressIndicator(color:AppColors.primaryLight,)) ///handles the loading
           : SingleChildScrollView(
               padding: EdgeInsets.symmetric(
                 vertical: height * 0.02,
@@ -58,7 +58,7 @@ class _HomeTabState extends State<HomeTab> {
                         imageIcon: AppAssets.tempIcon,
                         text: 'Temperature',
                         statusText:
-                            '${smartHomeProvider.temperature.toStringAsFixed(1)} C',
+                            '${smartHomeProvider.temperature.toStringAsFixed(1)} °C',
                       ),
                       CustomDataCard(
                         imageIcon: AppAssets.humidityIcon,
@@ -77,7 +77,7 @@ class _HomeTabState extends State<HomeTab> {
                       ),
                       CustomDataCard(
                         imageIcon: AppAssets.doorIcon,
-                        text: 'Door State',
+                        text: 'Door Status',
                         statusText: smartHomeProvider.doorState,
                       ),
                     ],

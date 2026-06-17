@@ -103,7 +103,7 @@ class CustomSwitchControl extends StatelessWidget {
                       size: 40,
                     ),
                   )
-                : Switch(
+                : Switch(        ///the switch turned off when disabled is true
                     value: value,
                     onChanged: disabled
                         ? null
