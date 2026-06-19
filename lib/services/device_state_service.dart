@@ -35,4 +35,10 @@ class DeviceStateService {
     return _sensorsRef.child('doorState').set(state);
   }
 
+  ///get auto mode value
+  static Future<bool> getAutoMode() async {
+    final snapshot = await _devicesRef.child('autoMode').get();
+    return snapshot.value == true;
+  }
+
 }

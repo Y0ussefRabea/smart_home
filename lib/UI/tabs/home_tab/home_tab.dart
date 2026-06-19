@@ -8,6 +8,7 @@ import 'package:smart_home/utils/app_colors.dart';
 import 'package:smart_home/utils/app_styles.dart';
 import 'custom_data_card.dart';
 import 'custom_switch_control.dart';
+import 'package:smart_home/services/voice_command_service.dart';
 
 class HomeTab extends StatefulWidget {
   const HomeTab({super.key});
@@ -18,6 +19,57 @@ class HomeTab extends StatefulWidget {
 
 class _HomeTabState extends State<HomeTab> {
   @override
+  void initState() {
+    super.initState();
+    VoiceCommandService.initialize();
+  }
+  Future<void> _handleVoiceCommand() async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const AlertDialog(
+        content: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.mic, color: Colors.blue),
+            SizedBox(width: 12),
+            Text('Listening...'),
+          ],
+        ),
+      ),
+    );
+
+    final provider = context.read<SmartHomeProvider>();
+    final text = await VoiceCommandService.listen(provider.voiceLanguage);
+
+    if (!mounted) return;
+    Navigator.of(context).pop();
+
+    if (text == null || text.isEmpty) {
+      showDialog(
+        context: context,
+        builder: (_) => const AlertDialog(
+          content: Text('❌ Could not hear you, try again'),
+        ),
+      );
+      return;
+    }
+
+    final result = await VoiceCommandService.processCommand(text);
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => AlertDialog(
+        content: Text(result),
+      ),
+    );
+
+
+    await Future.delayed(const Duration(seconds: 2));
+    if (mounted) Navigator.of(context).pop();
+  }
+  @override
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
@@ -25,6 +77,11 @@ class _HomeTabState extends State<HomeTab> {
    // bool autoMode = true;
     return Scaffold(
       backgroundColor: AppColors.whiteColor,
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: AppColors.primaryLight,
+        onPressed: _handleVoiceCommand,
+        child: const Icon(Icons.mic, color: Colors.white),
+      ),
       appBar: AppBar(
         elevation: 0,
         scrolledUnderElevation: 0,
@@ -179,6 +236,10 @@ class _HomeTabState extends State<HomeTab> {
                 ],
               ),
             ),
+
     );
   }
 }
+
+
+

@@ -18,5 +18,6 @@ class AppAssets {
   static const String aboutUsIcon='assets/images/aboutUs.png';
   static const String robotIcon='assets/images/robotIcon.png';
   static const String highTempIcon='assets/images/highTemp.png';
+  static const String voiceIcon='assets/images/voice.png';
 
 }

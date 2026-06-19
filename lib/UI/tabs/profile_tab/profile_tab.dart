@@ -1,10 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:smart_home/UI/tabs/profile_tab/about_us_screen.dart';
 import 'package:smart_home/UI/tabs/profile_tab/custom_container.dart';
 import 'package:smart_home/utils/app_assets.dart';
 import 'package:smart_home/utils/app_styles.dart';
 
+import '../../../providers/smart_home_provider.dart';
 import '../../../services/auth_services.dart';
 import '../../../utils/app_colors.dart';
 import '../../../utils/app_routes.dart';
@@ -21,24 +23,20 @@ class _ProfileTabState extends State<ProfileTab> {
   bool isLoading = false;
   @override
   Widget build(BuildContext context) {
+    var height = MediaQuery.of(context).size.height;
+    var width = MediaQuery.of(context).size.width;
     var user = FirebaseAuth.instance.currentUser;
+    final provider = context.read<SmartHomeProvider>();
     final displayName = user?.displayName?.trim().isNotEmpty == true
         ? user!.displayName!.trim()
         : "Guest";
-    // /// use the name of the user
-    //     ? user!.displayName!.trim()
-    // /// if the user doesn't have name,split the text that is before the '@' and use it as name
-    // /// else, use the word 'guest'
-    //     : (user?.email?.split('@').first ?? 'Guest');
 
-    var height = MediaQuery.of(context).size.height;
-    var width = MediaQuery.of(context).size.width;
     return Scaffold(
       backgroundColor: AppColors.whiteColor,
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(height*0.04),
+        preferredSize: Size.fromHeight(height * 0.04),
         child: AppBar(
-          toolbarHeight: height*0.06,
+          toolbarHeight: height * 0.06,
           automaticallyImplyLeading: false,
           scrolledUnderElevation: 0,
           title: Text(
@@ -53,7 +51,7 @@ class _ProfileTabState extends State<ProfileTab> {
         padding: EdgeInsets.only(
           left: width * 0.06,
           right: width * 0.06,
-          bottom: height*0.04
+          bottom: height * 0.04,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -72,10 +70,13 @@ class _ProfileTabState extends State<ProfileTab> {
               alignment: Alignment.centerLeft,
               child: Text(
                 'Account Info',
-                style: AppStyles.bold18black.copyWith(color: AppColors.primaryLight),
+                style: AppStyles.bold18black.copyWith(
+                  color: AppColors.primaryLight,
+                ),
               ),
             ),
             SizedBox(height: height * 0.02),
+
             ///username
             CustomContainer(
               title: 'Username',
@@ -92,25 +93,70 @@ class _ProfileTabState extends State<ProfileTab> {
             Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                'About Us',
-                style: AppStyles.bold18black.copyWith(color: AppColors.primaryLight),
+                'Settings',
+                style: AppStyles.bold18black.copyWith(
+                  color: AppColors.primaryLight,
+                ),
               ),
             ),
             SizedBox(height: height * 0.02),
-             CustomContainer(
-               title: 'About Us',
-               subTitle: 'Learn more about the app',
-               icon: AppAssets.aboutUsIcon,
-               onTap: () {
-                 Navigator.push(
-                   context,
-                   MaterialPageRoute(
-                     builder: (context) => const AboutUsScreen(),
-                   ),
-                 );
-               },
-             ),
-             SizedBox(height: height*0.04,),
+            Container(
+              padding: EdgeInsets.symmetric(
+                vertical: height*0.01,
+
+              ),
+              decoration: BoxDecoration(
+                color: const Color(0xFFD1E2F1),
+                borderRadius: BorderRadius.circular(36),
+
+              ),
+              child: ListTile(
+                leading: Image.asset(AppAssets.voiceIcon),
+                title: const Text('Command Language',maxLines: 3,),
+                trailing: DropdownButton<String>(
+                  iconEnabledColor: AppColors.primaryLight,
+                  borderRadius:  BorderRadius.circular(20),
+                  value: provider.voiceLanguage,
+                  underline: const SizedBox(),
+                  items: [
+                    DropdownMenuItem(value: 'en_US', child: Text('English',style: AppStyles.medium14Primary,)),
+                    DropdownMenuItem(value: 'ar_EG', child: Text('Arabic',style: AppStyles.medium14Primary,)),
+                  ],
+                  onChanged: (val) {
+                    if (val != null) provider.setVoiceLanguage(val);
+                    setState(() {
+                    });
+                  },
+
+                ),
+
+              ),
+            ),
+            SizedBox(height: height * 0.04),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'About Us',
+                style: AppStyles.bold18black.copyWith(
+                  color: AppColors.primaryLight,
+                ),
+              ),
+            ),
+            SizedBox(height: height * 0.02),
+            CustomContainer(
+              title: 'About Us',
+              subTitle: 'Learn more about the app',
+              icon: AppAssets.aboutUsIcon,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AboutUsScreen(),
+                  ),
+                );
+              },
+            ),
+            SizedBox(height: height * 0.04),
             CustomElevatedButton(
               backgroundColor: AppColors.whiteColor,
               hasIcon: true,
@@ -144,7 +190,7 @@ class _ProfileTabState extends State<ProfileTab> {
       Navigator.pushNamedAndRemoveUntil(
         context,
         AppRoutes.loginRouteName,
-            (route) => false,
+        (route) => false,
       );
     } catch (e) {
       if (!mounted) return;

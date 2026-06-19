@@ -171,6 +171,15 @@ class SmartHomeProvider extends ChangeNotifier {
     return 'Unknown';
   }
 
+  ///the language of the voice commands
+  String _voiceLanguage = 'en_US'; // default
+  String get voiceLanguage => _voiceLanguage;
+
+  void setVoiceLanguage(String locale) {
+    _voiceLanguage = locale;
+    notifyListeners();
+  }
+
   @override
   void dispose() {
     _statesSubscription?.cancel();
