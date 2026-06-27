@@ -39,11 +39,11 @@ class VoiceCommandService {
     if (text.contains('turn on')&&text.contains('auto') || text.contains('enable auto')||
         text.contains('افتح') && text.contains('الوضع الالي') || text.contains('افتح الوضع الالي')) {
       await DeviceStateService.setAutoMode(true);
-     // return 'Auto Mode ON';
+      return 'Auto Mode ON';
     }
     if (text.contains('turn off')&&text.contains('auto') || text.contains('disable auto')||
         text.contains('اقفل') && text.contains('الوضع الالي') || text.contains('اقفل الوضع الالي')) {
-      await DeviceStateService.setAutoMode(true);
+      await DeviceStateService.setAutoMode(false);
       return 'Auto Mode OFF';
     }
     //todo: Door

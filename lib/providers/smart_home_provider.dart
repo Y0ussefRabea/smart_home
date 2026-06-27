@@ -59,9 +59,7 @@ class SmartHomeProvider extends ChangeNotifier {
 
   void startListening() {
     _statesSubscription ??= DeviceStateService.statesStream.listen((event) {
-      final rootMap = _asMap(event.snapshot.value);
-
-      ///_asMap converts the object to a map(key:value)
+      final rootMap = _asMap(event.snapshot.value); ///_asMap converts the object to a map(key:value)
       final sensors = _asMap(rootMap['sensors']);
       final devices = _asMap(rootMap['devices']);
 
@@ -77,15 +75,19 @@ class SmartHomeProvider extends ChangeNotifier {
       /// Gas Leak
       if (!_gasSafe && !_gasAlertSent) {
         _gasAlertSent = true;
-        NotificationService.showNotification(title: 'Gas Leak Detected', body: "don't worry, the kitchen hood is on");
+        NotificationService.showNotification(title: 'Gas Leak Detected', body: "the kitchen hood is on");
         addNotification('Gas Leak Detected', 'gas');
+      }else if (_gasSafe) {
+        _gasAlertSent = false; //reset
       }
 
      /// Door Opened
       if (_doorState.toLowerCase() == 'unlocked' && !_doorAlertSent) {
         _doorAlertSent = true;
         NotificationService.showNotification(title: 'Door Unlocked', body: 'the main door has been unlocked');
-        addNotification('Door Unlocked', 'door'); //
+        addNotification('Door Unlocked', 'door');
+      }else if(_doorState.toLowerCase() == 'locked'){
+       _doorAlertSent=false;
       }
 
      /// High Temperature
@@ -93,6 +95,8 @@ class SmartHomeProvider extends ChangeNotifier {
         _tempAlertSent = true;
         NotificationService.showNotification(title: 'High Temperature', body: 'high temperature detected, the fan is on now');
         addNotification('High Temperature', 'temp');
+      }else if (_temperature <= 35) {
+        _tempAlertSent = false;
       }
 
       _outsideLightsOn = _asBool(devices['outsideLights'], fallback: false);
